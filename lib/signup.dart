@@ -1,4 +1,8 @@
+import 'package:assignment_2/app_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -8,9 +12,14 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUp extends State<SignUp> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isPassword2Visible = false;
   bool _isDarkMode = false;
+  bool isPasswordMatchError = false;
+  // final applicationState = context.read<ApplicationState>();
 
   void _toggleTheme() {
     setState(() {
@@ -19,6 +28,14 @@ class _SignUp extends State<SignUp> {
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   void _togglePasswordVisibility() {
     setState(() {
@@ -31,6 +48,12 @@ class _SignUp extends State<SignUp> {
       _isPassword2Visible = !_isPassword2Visible;
     });
   }
+
+  void validatePasswordMatch(String password, String confirmPassword) {
+  setState(() {
+    isPasswordMatchError = password != confirmPassword;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +295,8 @@ class _SignUp extends State<SignUp> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 print('account created');
-                              }
+                                // registerWithEmailAndPassword(email, password);
+                              }                              
                             },
                           ),
                         )
@@ -311,4 +335,6 @@ class _SignUp extends State<SignUp> {
           ),
         )));
   }
+  
+  void registerWithEmailAndPassword(email, password) {}
 }

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "34633959954",
+    "firebase_url": "https://mobiledev-a715a-default-rtdb.firebaseio.com",
+    "project_id": "mobiledev-a715a",
+    "storage_bucket": "mobiledev-a715a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34633959954:android:cb267737a5305323bce6cb",
+        "android_client_info": {
+          "package_name": "com.example.assignment_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWY2l8-GKZNHNc__H0RmfKfCm4hi215jQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

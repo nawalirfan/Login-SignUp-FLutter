@@ -1,4 +1,8 @@
+import 'package:assignment_2/app_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -10,7 +14,47 @@ class Login extends StatefulWidget {
 class _Login extends State<Login> {
   bool _isPasswordVisible = false;
   bool _isDarkMode = false;
+  bool isPasswordIncorrect = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void signIn(BuildContext context) async {
+    final appState = Provider.of<ApplicationState>(context, listen: false);
+    final email = emailController.text;
+    final password = passwordController.text;
+
+    try {
+      await appState.signInWithFirebase(email, password);
+      // If successful, navigate to the homepage
+      Navigator.pushNamed(context, '/homepage');
+    } catch (e) {
+      setState(() {
+        isPasswordIncorrect = true;
+      });
+    }
+  }
 
   void _toggleTheme() {
     setState(() {
@@ -79,6 +123,7 @@ class _Login extends State<Login> {
                     ),
                     const SizedBox(height: 40.0),
                     TextFormField(
+                      controller: emailController,
                       style: TextStyle(
                           color: _isDarkMode
                               ? const Color.fromARGB(255, 218, 210, 224)
@@ -132,6 +177,7 @@ class _Login extends State<Login> {
                     ),
                     const SizedBox(height: 20.0),
                     TextFormField(
+                      controller: passwordController,
                       style: TextStyle(
                           color: _isDarkMode
                               ? const Color.fromARGB(255, 218, 210, 224)
@@ -211,6 +257,37 @@ class _Login extends State<Login> {
                               if (_formKey.currentState!.validate()) {
                                 print('User Logged In');
                               }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const SizedBox(height: 20.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                _isDarkMode
+                                    ? const Color.fromARGB(255, 187, 157, 216)
+                                    : const Color.fromARGB(255, 163, 115, 207),
+                              ),
+                              foregroundColor: MaterialStateProperty.all(
+                                _isDarkMode
+                                    ? const Color.fromARGB(255, 46, 45, 46)
+                                    : const Color.fromARGB(255, 238, 230, 245),
+                              ),
+                            ),
+                            child: const Text(
+                              'Sign In With Google',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            onPressed: () async {
+                              await ApplicationState().signInWithGoogle();
                             },
                           ),
                         ),
