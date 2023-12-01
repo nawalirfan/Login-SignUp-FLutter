@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
@@ -14,7 +13,8 @@ class SignUp extends StatefulWidget {
 class _SignUp extends State<SignUp> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false;
   bool _isPassword2Visible = false;
   bool _isDarkMode = false;
@@ -50,10 +50,34 @@ class _SignUp extends State<SignUp> {
   }
 
   void validatePasswordMatch(String password, String confirmPassword) {
-  setState(() {
-    isPasswordMatchError = password != confirmPassword;
-  });
-}
+    setState(() {
+      isPasswordMatchError = password != confirmPassword;
+    });
+  }
+
+  void signUp(BuildContext context) async {
+    // Use appState to access Firebase authentication methods.
+    final appState = Provider.of<ApplicationState>(context, listen: false);
+    final email = emailController.text;
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    if (password != confirmPassword) {
+      validatePasswordMatch(password, confirmPassword);
+      return;
+    }
+
+    try {
+      // Use Firebase Authentication to create a new user
+      await appState.signUpWithFirebase(email, password);
+
+      // User registration is successful, you can navigate to another page
+      Navigator.pushNamed(context, '/login');
+    } catch (e) {
+      // Handle any registration errors, e.g., if the email is already in use
+      print("Error during registration: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +166,7 @@ class _SignUp extends State<SignUp> {
                         ),
                       ),
                       validator: (value) {
-                        if (value!.length > 10) {
+                        if (value!.length > 50) {
                           return 'Email is too long';
                         }
                         return null;
@@ -296,7 +320,7 @@ class _SignUp extends State<SignUp> {
                               if (_formKey.currentState!.validate()) {
                                 print('account created');
                                 // registerWithEmailAndPassword(email, password);
-                              }                              
+                              }
                             },
                           ),
                         )
@@ -335,6 +359,6 @@ class _SignUp extends State<SignUp> {
           ),
         )));
   }
-  
+
   void registerWithEmailAndPassword(email, password) {}
 }
